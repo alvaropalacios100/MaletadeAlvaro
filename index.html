@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff3e8">
+<title>Mi maleta · Asistente de viaje</title>
+<style>
+:root{--ink:#243044;--muted:#687386;--paper:#fffdf9;--line:#e7e5e0;--accent:#e8834a;--accent-dark:#b95725;--soft:#fff1e4;--shadow:0 14px 36px rgba(45,53,67,.09);--radius:24px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#fff7ef;color:var(--ink);font-family:ui-rounded,"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.45}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #4d9ce8;outline-offset:3px}
+.app{min-height:100vh;overflow:hidden;position:relative}
+.topbar{max-width:960px;margin:auto;padding:22px 20px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.04em;font-size:1.1rem}
+.brand-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:15px;background:#fff;box-shadow:0 4px 12px #26334a12;font-size:1.45rem}
+.local-tag{font-size:.75rem;color:var(--muted);background:#ffffffa8;border:1px solid #ffffff;padding:7px 10px;border-radius:999px}
+main{max-width:960px;margin:auto;padding:12px 20px 54px}
+.hero{position:relative;padding:28px 28px 26px;border-radius:30px;background:linear-gradient(125deg,#fffaf3,#ffead9);border:1px solid #fff;box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px}
+.hero:after{content:"";position:absolute;width:210px;height:210px;border:1px dashed #e7a77b;right:-50px;top:-74px;border-radius:50%;opacity:.7}
+.hero-kicker{text-transform:uppercase;font-size:.72rem;font-weight:850;letter-spacing:.14em;color:var(--accent-dark)}
+h1{font-size:clamp(2rem,6vw,3.5rem);letter-spacing:-.065em;line-height:1.02;margin:9px 0 12px;max-width:600px}
+.hero p{color:#626d7c;margin:0;max-width:540px}
+.hero-stamp{position:absolute;right:28px;bottom:20px;font-size:clamp(3rem,8vw,5rem);transform:rotate(-10deg);filter:drop-shadow(0 8px 8px #8b583322)}
+.progress-steps{display:flex;gap:8px;align-items:center;margin:0 0 18px;color:var(--muted);font-size:.82rem;font-weight:750}
+.step{padding:8px 12px;border-radius:999px;background:#ffffff9c;border:1px solid #f1e2d4}
+.step.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.step-line{width:22px;height:1px;background:#d9c9bc}
+.panel{background:var(--paper);border:1px solid #fff;box-shadow:var(--shadow);border-radius:var(--radius);padding:clamp(18px,4vw,30px)}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+h2{font-size:1.35rem;letter-spacing:-.035em;margin:0 0 5px}
+.sub{font-size:.9rem;color:var(--muted);margin:0}
+.section-number{flex-shrink:0;width:38px;height:38px;display:grid;place-items:center;border-radius:13px;background:var(--soft);color:var(--accent-dark);font-weight:900}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.field{min-width:0;padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
+.field.full{grid-column:1/-1}
+.field-title{display:block;font-size:.91rem;font-weight:800;margin-bottom:10px}
+.field-note{font-size:.78rem;color:var(--muted);margin-top:7px}
+select{width:100%;min-height:48px;padding:10px 38px 10px 13px;border:1px solid #dcdfe5;border-radius:13px;background:#fff;color:var(--ink)}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.choice{position:relative}
+.choice input{position:absolute;opacity:0;width:1px;height:1px}
+.choice span{display:flex;align-items:center;gap:8px;min-height:46px;padding:10px 12px;border:1px solid #e1e3e8;border-radius:13px;background:#fff;font-size:.88rem;font-weight:700;transition:.15s}
+.choice span:before{content:"";width:17px;height:17px;border:1.5px solid #c5cad3;border-radius:50%;flex-shrink:0}
+.choice input:checked+span{border-color:var(--accent);background:var(--soft);color:#8e431c;box-shadow:inset 0 0 0 1px var(--accent)}
+.choice input:checked+span:before{border:5px solid var(--accent);background:white}
+.choice input:focus-visible+span{outline:3px solid #4d9ce8;outline-offset:2px}
+.switches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #e1e3e8;border-radius:14px;padding:12px;background:#fff;min-height:62px}
+.switch-text{font-weight:750;font-size:.88rem}
+.switch input{appearance:none;width:43px;height:25px;flex-shrink:0;border-radius:30px;background:#d7dce4;position:relative;transition:.2s;cursor:pointer;margin:0}
+.switch input:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;border-radius:50%;background:white;box-shadow:0 1px 4px #0002;transition:.2s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked:before{transform:translateX(18px)}
+.switch input:focus-visible{outline:3px solid #4d9ce8;outline-offset:3px}
+.conditional{margin-top:12px;padding:14px;border-radius:14px;background:#fff6ee;border:1px dashed #e7b28e}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.btn{border:0;border-radius:14px;padding:13px 18px;font-weight:850;display:inline-flex;justify-content:center;align-items:center;gap:8px;transition:transform .12s,background .12s;min-height:48px}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink);color:#fff;box-shadow:0 6px 15px #26334a20}
+.btn-primary:hover{background:#35455f}
+.btn-soft{background:#f2f3f5;color:var(--ink)}
+.btn-soft:hover{background:#e7e9ed}
+.btn-accent{background:var(--accent);color:white}
+.btn-danger{background:#fff0ed;color:#a33c2b}
+.hidden{display:none!important}
+.list-page{--accent:#dd8046;--accent-dark:#9c4b20;--soft:#fff0e1;background:transparent;position:relative}
+.list-page.beach{--accent:#258eae;--accent-dark:#12657e;--soft:#e0f6fc}
+.list-page.beach .list-hero{background:linear-gradient(135deg,#c8f0fa 0%,#e8fbff 58%,#fff9e7 100%);border-color:#d8f6fc}
+.list-page.beach .list-hero:before{content:"";position:absolute;width:230px;height:100px;right:-25px;bottom:-46px;border-radius:50%;background:#80d5e8;opacity:.5;transform:rotate(-14deg)}
+.list-page.beach .list-hero:after{content:"";position:absolute;width:190px;height:70px;right:50px;bottom:-49px;border-radius:50%;border-top:3px solid #4ab4d0;transform:rotate(-14deg)}
+.list-page:not(.beach) .list-hero{background:linear-gradient(135deg,#fff0df,#fffaf3 72%,#ffe5c9)}
+.list-hero{position:relative;overflow:hidden;padding:24px 24px 25px;border-radius:27px;border:1px solid white;box-shadow:var(--shadow);margin-bottom:15px}
+.list-hero .hero-kicker{color:var(--accent-dark)}
+.list-hero h1{font-size:clamp(1.9rem,6vw,3rem);margin:8px 0}
+.list-hero p{margin:0;color:#5d6979}
+.list-emoji{position:absolute;right:20px;top:18px;font-size:clamp(2.5rem,8vw,4.3rem);transform:rotate(8deg);filter:drop-shadow(0 7px 7px #25334a1a)}
+.trip-summary{display:flex;flex-wrap:wrap;gap:7px;margin-top:17px}
+.pill{font-size:.78rem;font-weight:800;padding:7px 10px;background:#ffffffbd;border:1px solid #ffffffd9;border-radius:999px;color:#445064}
+.progress-card{background:#fff;border-radius:20px;padding:17px 19px;margin-bottom:15px;box-shadow:0 8px 24px #28364b0a;border:1px solid #fff}
+.progress-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+.progress-count{font-weight:900;font-size:1rem;letter-spacing:-.02em}
+.progress-percent{font-size:.8rem;font-weight:850;color:var(--accent-dark);background:var(--soft);padding:5px 9px;border-radius:999px}
+.progress-track{height:9px;background:#edf0f3;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f4b26e);border-radius:99px;transition:width .25s}
+.list-page.beach .progress-fill{background:linear-gradient(90deg,#229bb9,#75d8e9)}
+.list-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.list-tools .btn{font-size:.82rem;padding:10px 13px;min-height:42px}
+.items-panel{background:#fff;border:1px solid #fff;border-radius:22px;padding:8px 16px;box-shadow:var(--shadow)}
+.item-row{display:flex;align-items:center;gap:13px;min-height:58px;padding:11px 2px;border-bottom:1px solid #eef0f2;transition:opacity .18s}
+.item-row:last-child{border-bottom:0}
+.item-check{appearance:none;flex-shrink:0;width:24px;height:24px;border:2px solid #c8ced7;border-radius:8px;background:#fff;cursor:pointer;display:grid;place-items:center;margin:0}
+.item-check:checked{background:var(--accent);border-color:var(--accent)}
+.item-check:checked:after{content:"✓";color:white;font-weight:950;font-size:16px;line-height:1}
+.item-check:focus-visible{outline:3px solid #4d9ce8;outline-offset:3px}
+.item-copy{flex:1;min-width:0}
+.item-name{font-size:.96rem;font-weight:780;display:block;overflow-wrap:anywhere}
+.item-detail{font-size:.78rem;color:var(--muted);display:block;margin-top:2px}
+.item-row.done{opacity:.48}
+.item-row.done .item-name{text-decoration:line-through;text-decoration-thickness:1.5px}
+.item-row.manual .item-name:after{content:"PERSONALIZADO";font-size:.58rem;letter-spacing:.07em;margin-left:8px;color:var(--accent-dark);background:var(--soft);border-radius:5px;padding:3px 5px;vertical-align:2px}
+.add-row{padding:15px 0 8px}
+.add-btn{width:100%;border:1.5px dashed #c8ced7;background:#fafbfc;color:var(--ink);border-radius:15px;padding:14px;font-weight:850}
+.add-btn:hover{background:var(--soft);border-color:var(--accent)}
+.add-form{display:flex;gap:8px;margin-top:10px}
+.add-form input{flex:1;min-width:0;border:1px solid #d9dee6;border-radius:12px;padding:12px}
+.add-form .btn{padding:10px 13px}
+.footer-note{text-align:center;color:var(--muted);font-size:.75rem;margin:18px 0 0}
+.celebration{position:fixed;inset:0;z-index:20;pointer-events:none;display:grid;place-items:center;padding:20px}
+.celebration-card{pointer-events:none;position:relative;z-index:2;background:#fff;border:1px solid #ffffff;border-radius:24px;padding:25px 28px;text-align:center;box-shadow:0 18px 70px #26334a33;max-width:340px;animation:pop .4s cubic-bezier(.2,1.4,.5,1)}
+.celebration-card .big{font-size:3rem;display:block;margin-bottom:4px}
+.celebration-card h2{font-size:1.6rem;margin:0 0 7px}
+.celebration-card p{margin:0;color:var(--muted);font-size:.9rem}
+.confetti{position:fixed;z-index:21;top:-14px;width:9px;height:15px;pointer-events:none;animation:fall var(--duration) linear forwards;left:var(--left);background:var(--color);transform:rotate(var(--rotate));border-radius:2px}
+@keyframes fall{to{transform:translate3d(var(--drift),110vh,0) rotate(780deg);opacity:.85}}
+@keyframes pop{from{transform:scale(.7) translateY(15px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+@media(max-width:620px){.topbar{padding:15px 15px 8px}.local-tag{font-size:.68rem}main{padding:10px 13px 34px}.hero{padding:23px 20px 26px;border-radius:24px}.hero-stamp{right:16px;bottom:12px;opacity:.9}.hero p{max-width:75%}.fields{grid-template-columns:1fr;gap:12px}.field.full{grid-column:auto}.panel{padding:18px 15px}.choices{grid-template-columns:1fr 1fr}.choice span{padding:9px 8px;font-size:.81rem}.switches{grid-template-columns:1fr 1fr}.switch{padding:10px}.switch-text{font-size:.81rem}.list-hero{padding:21px 18px 22px}.list-emoji{right:13px;top:15px}.list-hero p{max-width:75%}.trip-summary{gap:5px}.pill{font-size:.7rem;padding:6px 8px}.items-panel{padding:7px 13px}.list-tools .btn{flex:1}.actions .btn{flex:1}.progress-card{padding:15px}.item-name{font-size:.93rem}}
+@media(max-width:360px){.choices,.switches{grid-template-columns:1fr}.hero p,.list-hero p{max-width:100%}.hero-stamp{opacity:.25}.list-emoji{opacity:.4}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-icon">🧳</span><span>Mi maleta</span></div>
+    <span class="local-tag">✦ Tu viaje, bien preparado</span>
+  </header>
+  <main>
+    <section id="setupView">
+      <div class="hero">
+        <div class="hero-kicker">Tu asistente de equipaje</div>
+        <h1>Menos olvidos.<br>Más viaje.</h1>
+        <p>Cuéntame lo justo sobre tu escapada y preparo una lista a tu medida.</p>
+        <div class="hero-stamp" aria-hidden="true">🎒</div>
+      </div>
+      <div class="progress-steps" aria-label="Pasos">
+        <span class="step active">1 · Configura</span><span class="step-line"></span><span class="step">2 · Prepara</span>
+      </div>
+      <form class="panel" id="tripForm">
+        <div class="panel-head"><div><h2>¿Qué viaje tienes por delante?</h2><p class="sub">La lista se adapta automáticamente a tus respuestas.</p></div><span class="section-number">01</span></div>
+        <div class="fields">
+          <div class="field">
+            <label class="field-title" for="nights">¿Cuántas noches te vas?</label>
+            <select id="nights" name="nights">
+              <option value="0">0 noches · ida y vuelta</option>
+              <option value="1">1 noche</option><option value="2">2 noches</option><option value="3">3 noches</option>
+              <option value="4">4 noches</option><option value="5">5 noches</option><option value="6">6 noches</option>
+              <option value="7">7 noches</option><option value="8">8 noches</option><option value="9">9 noches</option><option value="10">10 noches</option>
+              <option value="11">11 noches</option><option value="12">12 noches</option><option value="13">13 noches</option><option value="14">14 noches</option>
+              <option value="15">15 noches</option><option value="16">16 noches</option><option value="17">17 noches</option><option value="18">18 noches</option>
+              <option value="19">19 noches</option><option value="20">20 noches</option><option value="21">21 noches</option><option value="22">22 noches</option>
+              <option value="23">23 noches</option><option value="24">24 noches</option><option value="25">25 noches</option><option value="26">26 noches</option>
+              <option value="27">27 noches</option><option value="28">28 noches</option><option value="29">29 noches</option><option value="30">30 noches</option>
+            </select>
+          </div>
+          <div class="field">
+            <span class="field-title">¿Cómo te desplazas?</span>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="transport" value="plane" required><span>✈️ Avión</span></label>
+              <label class="choice"><input type="radio" name="transport" value="train"><span>🚆 Tren</span></label>
+              <label class="choice"><input type="radio" name="transport" value="drive"><span>🚗 Conduzco yo</span></label>
+              <label class="choice"><input type="radio" name="transport" value="passenger"><span>🚙 Voy de pasajero</span></label>
+              <label class="choice"><input type="radio" name="transport" value="other"><span>🚌 Otro</span></label>
+            </div>
+          </div>
+          <div class="field full">
+            <span class="field-title">¿Qué condiciones tendrá el viaje?</span>
+            <div class="switches">
+              <label class="switch"><span class="switch-text">🏖️ Playa o piscina</span><input type="checkbox" id="beach" name="beach" aria-label="Playa o piscina"></label>
+              <label class="switch"><span class="switch-text">🎟️ Necesito entradas</span><input type="checkbox" id="tickets" name="tickets" aria-label="Necesito entradas"></label>
+              <label class="switch"><span class="switch-text">🌧️ Se espera lluvia</span><input type="checkbox" id="rain" name="rain" aria-label="Se espera lluvia"></label>
+              <label class="switch"><span class="switch-text">🌍 Viajo al extranjero</span><input type="checkbox" id="abroad" name="abroad" aria-label="Viajo al extranjero"></label>
+            </div>
+            <div id="euConditional" class="conditional hidden">
+              <label class="switch"><span class="switch-text">🛂 Destino fuera de la Unión Europea</span><input type="checkbox" id="outsideEU" name="outsideEU" aria-label="Destino fuera de la Unión Europea"></label>
+              <div class="field-note">Solo se pregunta si viajas al extranjero.</div>
+            </div>
+          </div>
+        </div>
+        <div class="actions"><button class="btn btn-primary" type="submit">Generar mi maleta <span aria-hidden="true">→</span></button></div>
+      </form>
+    </section>
+
+    <section id="listView" class="list-page hidden">
+      <div class="progress-steps"><span class="step">1 · Configura</span><span class="step-line"></span><span class="step active">2 · Prepara</span></div>
+      <div class="list-hero">
+        <div class="hero-kicker">Lista de equipaje · personalizada</div>
+        <h1>¡A preparar la maleta!</h1>
+        <p id="listIntro">Todo lo que necesitas, sin extras.</p>
+        <span class="list-emoji" id="listEmoji" aria-hidden="true">🧳</span>
+        <div class="trip-summary" id="tripSummary"></div>
+      </div>
+      <div class="progress-card">
+        <div class="progress-line"><span class="progress-count" id="progressCount">0/0 preparados</span><span class="progress-percent" id="progressPercent">0 %</span></div>
+        <div class="progress-track" role="progressbar" aria-label="Progreso de la maleta" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="list-tools">
+        <button class="btn btn-soft" id="editBtn" type="button">← Editar viaje</button>
+        <button class="btn btn-soft" id="regenBtn" type="button">↻ Regenerar lista</button>
+        <button class="btn btn-soft" id="uncheckBtn" type="button">□ Desmarcar todo</button>
+        <button class="btn btn-danger" id="newBtn" type="button">＋ Nueva maleta</button>
+      </div>
+      <div class="items-panel" id="itemsPanel" aria-label="Lista de cosas para llevar"></div>
+      <div class="add-row">
+        <button class="add-btn" id="showAddBtn" type="button">＋ Añadir elemento</button>
+        <form class="add-form hidden" id="addForm">
+          <input id="customItem" type="text" maxlength="100" placeholder="¿Qué quieres añadir?" aria-label="Elemento personalizado" autocomplete="off">
+          <button class="btn btn-primary" type="submit">Añadir</button>
+          <button class="btn btn-soft" id="cancelAddBtn" type="button" aria-label="Cancelar">✕</button>
+        </form>
+      </div>
+      <p class="footer-note">Tu lista se guarda automáticamente en este dispositivo.</p>
+    </section>
+  </main>
+</div>
+<div id="celebration" class="celebration hidden" aria-live="polite">
+  <div class="celebration-card"><span class="big">🎉🧳</span><h2>¡Maleta lista!</h2><p>Todo preparado. Ahora toca disfrutar del viaje.</p></div>
+</div>
+<script>
+(() => {
+  "use strict";
+  const STORAGE_KEY = "mi-maleta-v1";
+  const $ = (id) => document.getElementById(id);
+  const setupView = $("setupView"), listView = $("listView"), form = $("tripForm");
+  let trip = null;
+  let items = [];
+  let itemId = 0;
+  let celebrated = false;
+  let confettiTimers = [];
+
+  // Reglas de la lista: mantener aquí las condiciones y los nombres de los elementos.
+  function buildItems(t) {
+    const nights = Number(t.nights);
+    const days = nights + 1;
+    const result = [];
+    const add = (name, detail = "") => result.push({ id: "item-" + (++itemId), name, detail, checked: false, manual: false });
+    // Siempre
+    add(`Ropa x${days}`);
+    ["Neceser", "Gafas de sol", "Auriculares x2", "Botella de agua", "Cargador", "Power bank", "Enjuague bucal", "Clinex", "Chicles"].forEach(name => add(name));
+    // Al menos una noche
+    if (nights >= 1) {
+      ["Laca", "Bolsa de plástico", "Cepillo pelo", "Calzador", "Dientes", "Limpia lengua"].forEach(name => add(name));
+      add("Pastillas pelo", `Minoxidil x${nights} · Finasteride x${days}`);
+      add("Picoteo");
+      add("Secador de pelo");
+      add(`Pastillas para dormir x${nights}`);
+    }
+    // Playa o piscina
+    if (t.beach) ["Bañador", "Toalla", "Crema solar", "Chanclas"].forEach(name => add(name));
+    // Más de una noche
+    if (nights > 1) ["Desodorante", "Colonia", "Crema facial"].forEach(name => add(name));
+    // Maquinilla: no avión >2 noches, avión >3 noches
+    if ((t.transport !== "plane" && nights > 2) || (t.transport === "plane" && nights > 3)) add("Maquinilla");
+    // Tablet: tren, avión o coche de pasajero
+    if (["train", "plane", "passenger"].includes(t.transport)) add("Tablet");
+    if (t.rain) add("Paraguas");
+    if (t.tickets) add("Entradas");
+    if (t.abroad) add("Efectivo");
+    if (t.abroad && t.outsideEU) { add("Pasaporte"); add("Tarjeta eSIM"); }
+    return result;
+  }
+
+  function readTrip() {
+    const data = new FormData(form);
+    return {
+      nights: Number(data.get("nights") || 0),
+      transport: data.get("transport"),
+      beach: $("beach").checked,
+      tickets: $("tickets").checked,
+      rain: $("rain").checked,
+      abroad: $("abroad").checked,
+      outsideEU: $("abroad").checked && $("outsideEU").checked
+    };
+  }
+  function persist() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ trip, items, view: listView.classList.contains("hidden") ? "setup" : "list" })); } catch (_) {}
+  }
+  function restoreForm(t) {
+    $("nights").value = String(t.nights ?? 0);
+    document.querySelectorAll('input[name="transport"]').forEach(el => el.checked = el.value === t.transport);
+    $("beach").checked = !!t.beach;
+    $("tickets").checked = !!t.tickets;
+    $("rain").checked = !!t.rain;
+    $("abroad").checked = !!t.abroad;
+    $("outsideEU").checked = !!t.outsideEU;
+    updateEUField();
+  }
+  function updateEUField() {
+    const show = $("abroad").checked;
+    $("euConditional").classList.toggle("hidden", !show);
+    if (!show) $("outsideEU").checked = false;
+  }
+  function transportLabel(value) {
+    return ({plane:"Avión",train:"Tren",drive:"Conduzco yo",passenger:"Coche de pasajero",other:"Otro transporte"})[value] || "Transporte sin indicar";
+  }
+  function renderSummary() {
+    const tags = [`${trip.nights} ${trip.nights === 1 ? "noche" : "noches"}`, `${trip.nights + 1} ${trip.nights + 1 === 1 ? "día" : "días"}`, transportLabel(trip.transport)];
+    if (trip.beach) tags.push("🏖️ Playa/piscina");
+    if (trip.abroad) tags.push("🌍 Extranjero");
+    if (trip.abroad && trip.outsideEU) tags.push("Fuera de la UE");
+    $("tripSummary").replaceChildren(...tags.map(tag => { const span = document.createElement("span"); span.className = "pill"; span.textContent = tag; return span; }));
+    $("listEmoji").textContent = trip.beach ? "🏖️" : trip.transport === "plane" ? "✈️" : trip.transport === "train" ? "🚆" : "🧳";
+    $("listIntro").textContent = trip.beach ? "Un toque de mar, sol y vacaciones. Marca cada cosa al guardarla." : "Una lista clara para salir con todo y viajar sin preocupaciones.";
+    listView.classList.toggle("beach", !!trip.beach);
+  }
+  function renderItems() {
+    const panel = $("itemsPanel");
+    panel.replaceChildren();
+    items.forEach(item => {
+      const row = document.createElement("label");
+      row.className = "item-row" + (item.checked ? " done" : "") + (item.manual ? " manual" : "");
+      const check = document.createElement("input");
+      check.type = "checkbox"; check.className = "item-check"; check.checked = !!item.checked;
+      check.setAttribute("aria-label", "Marcar " + item.name + " como preparado");
+      check.addEventListener("change", () => {
+        item.checked = check.checked;
+        row.classList.toggle("done", item.checked);
+        updateProgress(); persist();
+      });
+      const copy = document.createElement("span"); copy.className = "item-copy";
+      const name = document.createElement("span"); name.className = "item-name"; name.textContent = item.name;
+      copy.append(name);
+      if (item.detail) { const detail = document.createElement("span"); detail.className = "item-detail"; detail.textContent = item.detail; copy.append(detail); }
+      row.append(check, copy); panel.append(row);
+    });
+    updateProgress();
+  }
+  function clearConfetti() {
+    document.querySelectorAll(".confetti").forEach(el => el.remove());
+    $("celebration").classList.add("hidden");
+    confettiTimers.forEach(clearTimeout); confettiTimers = [];
+  }
+  function celebrate() {
+    clearConfetti();
+    $("celebration").classList.remove("hidden");
+    const colors = trip && trip.beach ? ["#1387a6","#55c5df","#f6c85f","#ffffff","#5cae91"] : ["#e8834a","#f6bd60","#d95d39","#7aa095","#5b6f9c"];
+    for (let i = 0; i < 95; i++) {
+      const bit = document.createElement("i"); bit.className = "confetti";
+      bit.style.setProperty("--left", (Math.random() * 100) + "vw");
+      bit.style.setProperty("--color", colors[Math.floor(Math.random() * colors.length)]);
+      bit.style.setProperty("--duration", (2.3 + Math.random() * 2.2) + "s");
+      bit.style.setProperty("--drift", ((Math.random() - .5) * 240) + "px");
+      bit.style.setProperty("--rotate", (Math.random() * 360) + "deg");
+      bit.style.width = (5 + Math.random() * 7) + "px";
+      bit.style.height = (8 + Math.random() * 10) + "px";
+      document.body.append(bit);
+      confettiTimers.push(setTimeout(() => bit.remove(), 5000));
+    }
+    confettiTimers.push(setTimeout(() => $("celebration").classList.add("hidden"), 3400));
+  }
+  function updateProgress() {
+    const total = items.length, done = items.filter(i => i.checked).length;
+    const percent = total ? Math.round(done / total * 100) : 0;
+    $("progressCount").textContent = `${done}/${total} preparados`;
+    $("progressPercent").textContent = `${percent} %`;
+    $("progressFill").style.width = percent + "%";
+    $("progressTrack").setAttribute("aria-valuenow", String(percent));
+    const complete = total > 0 && done === total;
+    if (complete && !celebrated) { celebrated = true; celebrate(); }
+    if (!complete && celebrated) { celebrated = false; clearConfetti(); }
+    persist();
+  }
+  function generate({preserveChecks = true} = {}) {
+    const old = new Map();
+    if (preserveChecks) items.forEach(item => old.set((item.manual ? "manual:" : "rule:") + item.name, item));
+    itemId = 0;
+    const generated = buildItems(trip);
+    generated.forEach(item => {
+      const prior = old.get("rule:" + item.name);
+      if (prior) { item.checked = prior.checked; item.id = prior.id; }
+    });
+    const manualItems = preserveChecks ? items.filter(item => item.manual) : [];
+    items = generated.concat(manualItems);
+    // Keep manually added items and their checks during a regeneration.
+    itemId = Math.max(itemId, items.length);
+    celebrated = false; clearConfetti();
+    renderSummary(); renderItems();
+    setupView.classList.add("hidden"); listView.classList.remove("hidden");
+    window.scrollTo({top:0, behavior:"smooth"});
+    persist();
+  }
+  function showSetup() {
+    setupView.classList.remove("hidden"); listView.classList.add("hidden");
+    if (trip) restoreForm(trip);
+    persist(); window.scrollTo({top:0, behavior:"smooth"});
+  }
+  function newSuitcase() {
+    if (!confirm("¿Empezar una maleta nueva? Se borrará la lista y sus checks guardados.")) return;
+    trip = null; items = []; itemId = 0; celebrated = false; clearConfetti();
+    form.reset(); $("nights").value = "0"; updateEUField();
+    setupView.classList.remove("hidden"); listView.classList.add("hidden");
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  $("abroad").addEventListener("change", updateEUField);
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const selected = form.querySelector('input[name="transport"]:checked');
+    if (!selected) { form.querySelector('input[name="transport"]').focus(); return; }
+    trip = readTrip();
+    generate({preserveChecks:false});
+  });
+  $("editBtn").addEventListener("click", showSetup);
+  $("regenBtn").addEventListener("click", () => { if (trip) { trip = readTripFromCurrentFormOrStored(); generate({preserveChecks:true}); } });
+  function readTripFromCurrentFormOrStored() {
+    // Editing the form is explicit; otherwise keep the trip settings that generated this list.
+    return trip;
+  }
+  $("uncheckBtn").addEventListener("click", () => {
+    items.forEach(item => item.checked = false);
+    celebrated = false; clearConfetti(); renderItems(); persist();
+  });
+  $("newBtn").addEventListener("click", newSuitcase);
+  $("showAddBtn").addEventListener("click", () => {
+    $("addForm").classList.remove("hidden"); $("showAddBtn").classList.add("hidden"); $("customItem").focus();
+  });
+  $("cancelAddBtn").addEventListener("click", () => {
+    $("addForm").classList.add("hidden"); $("showAddBtn").classList.remove("hidden"); $("customItem").value = "";
+  });
+  $("addForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const input = $("customItem"), name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    items.push({id:"custom-" + Date.now() + "-" + Math.random().toString(36).slice(2,7), name, detail:"", checked:false, manual:true});
+    input.value = ""; $("addForm").classList.add("hidden"); $("showAddBtn").classList.remove("hidden");
+    renderItems(); persist();
+  });
+
+  // Recuperación automática de viaje, lista y casillas al volver a abrir el archivo.
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (saved && saved.trip && Array.isArray(saved.items) && saved.items.length) {
+      trip = saved.trip; items = saved.items; restoreForm(trip);
+      if (saved.view === "list") { setupView.classList.add("hidden"); listView.classList.remove("hidden"); }
+      renderSummary(); renderItems();
+      persist();
+    } else updateEUField();
+  } catch (_) { updateEUField(); }
+})();
+</script>
+</body>
+</html>
